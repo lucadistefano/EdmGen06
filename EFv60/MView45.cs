@@ -2555,6 +2555,46 @@ namespace Store
         partial void OnIsMultiSetChanging(global::System.Boolean value);
         partial void OnIsMultiSetChanged();
 
+        [EdmScalarPropertyAttribute(EntityKeyProperty = false, IsNullable = true)]
+        [DataMemberAttribute()]
+        public Nullable<global::System.Int32> FixedLength
+        {
+            get
+            {
+                return _FixedLength;
+            }
+            set
+            {
+                OnFixedLengthChanging(value);
+                ReportPropertyChanging("FixedLength");
+                _FixedLength = StructuralObject.SetValidValue(value);
+                ReportPropertyChanged("FixedLength");
+                OnFixedLengthChanged();
+            }
+        }
+        private Nullable<global::System.Int32> _FixedLength;
+        partial void OnFixedLengthChanging(Nullable<global::System.Int32> value);
+        partial void OnFixedLengthChanged();
+        [EdmScalarPropertyAttribute(EntityKeyProperty = false, IsNullable = true)]
+        [DataMemberAttribute()]
+        public Nullable<global::System.Int32> Unicode
+        {
+            get
+            {
+                return _Unicode;
+            }
+            set
+            {
+                OnUnicodeChanging(value);
+                ReportPropertyChanging("Unicode");
+                _Unicode = StructuralObject.SetValidValue(value);
+                ReportPropertyChanged("Unicode");
+                OnUnicodeChanged();
+            }
+        }
+        private Nullable<global::System.Int32> _Unicode;
+        partial void OnUnicodeChanging(Nullable<global::System.Int32> value);
+        partial void OnUnicodeChanged();
         #endregion
 
         #region 複合プロパティ

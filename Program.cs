@@ -15,13 +15,26 @@ namespace EdmGen06 {
                     );
                 return;
             }
+            if (args.Length >= 7 && args[0] == "/EFModelGen")
+            {
+                new EdmGenModelGen().ModelGen2(
+                    args[1], //connection
+                    args[2], //provider
+                    args[3], //type provider services
+                    args[4], //csdl model name
+                    args[5], //target schema (ssdl model)                   
+                    (args.Length > 7) ? new Version(args[7]) : new Version("3.0"),
+                    args[6] //edmx name
+                );
+                return;
+            }
             if (args.Length >= 6 && args[0] == "/EFModelGen") {
                 new EdmGenModelGen().ModelGen2(
-                    args[1],
-                    args[2],
-                    args[3],
-                    args[4],
-                    args[5],
+                    args[1], //connection
+                    args[2], //provider
+                    args[3], //type provider services
+                    args[4], //model name
+                    args[5], //target schema
                     (args.Length > 6) ? new Version(args[6]) : new Version("3.0")
                     );
                 return;

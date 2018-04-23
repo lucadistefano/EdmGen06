@@ -24,14 +24,16 @@ namespace EdmGen06 {
             ModelGen2(connectionString, providerName, null, modelName, targetSchema, yver);
         }
 
-        public void ModelGen2(String connectionString, String providerName, String typeProviderServices, String modelName, String targetSchema, Version yver) {
+        public void ModelGen2(String connectionString, String providerName, String typeProviderServices, String modelName, String targetSchema, Version yver, string edmx=null) {
             String baseDir = Environment.CurrentDirectory;
+            if (edmx==null)
+                edmx = modelName;
+            String fpssdl3 = Path.Combine(baseDir, edmx + ".ssdl");
+            String fpcsdl3 = Path.Combine(baseDir, edmx + ".csdl");
+            String fpmsl3 = Path.Combine(baseDir, edmx + ".msl");
 
-            String fpssdl3 = Path.Combine(baseDir, modelName + ".ssdl");
-            String fpcsdl3 = Path.Combine(baseDir, modelName + ".csdl");
-            String fpmsl3 = Path.Combine(baseDir, modelName + ".msl");
-            String fpedmx3 = Path.Combine(baseDir, modelName + ".edmx");
-            String fpconfig = Path.Combine(baseDir, modelName + ".App.config");
+            String fpedmx3 = Path.Combine(baseDir, edmx + ".edmx");
+            String fpconfig = Path.Combine(baseDir, edmx + ".App.config");
 
             if (false) { }
             else if (yver == new Version(1, 0)) { xEDMX = "{" + NS.EDMXv1 + "}"; xSSDL = "{" + NS.SSDLv1 + "}"; xCSDL = "{" + NS.CSDLv1 + "}"; xMSL = "{" + NS.MSLv1 + "}"; Trace.TraceEvent(TraceEventType.Information, 101, "ModelGen v1"); }
@@ -156,6 +158,7 @@ namespace EdmGen06 {
                     + "Metadata=" + fpcsdl + "|" + fpssdl + "|" + fpmsl + ";"
                     ;
 
+                //xEDMX = xEDMX + "edmx:";
                 XElement mssdl, mcsdl, mmsl;
                 XDocument mEdmx = new XDocument(); // XDocument: ModelGen edmx
                 mEdmx.Add(
@@ -369,6 +372,24 @@ namespace EdmGen06 {
                                 ssdlProperty.SetAttributeValue("Nullable", "false");
                                 csdlProperty.SetAttributeValue("Nullable", "false");
                             }
+                            //if (dbc.ColumnType.Precision.HasValue)
+                            //{
+                            //    int maxLen = dbc.ColumnType.Precision.Value;
+                            //    if (maxLen != -1)
+                            //    {
+                            //        ssdlProperty.SetAttributeValue("Precision", dbc.ColumnType.Precision.Value + "");
+                            //        csdlProperty.SetAttributeValue("Precision", dbc.ColumnType.Precision.Value + "");
+                            //    }
+                            //}
+                            if ( dbc.ColumnType.DateTimePrecision.HasValue)
+                            {
+                                int maxLen = dbc.ColumnType.DateTimePrecision.Value;
+                                if (maxLen != -1)
+                                {
+                                    ssdlProperty.SetAttributeValue("Precision", dbc.ColumnType.DateTimePrecision.Value + "");
+                                    csdlProperty.SetAttributeValue("Precision", dbc.ColumnType.DateTimePrecision.Value + "");
+                                }
+                            }
                             if (dbc.ColumnType.MaxLength.HasValue) {
                                 int maxLen = dbc.ColumnType.MaxLength.Value;
                                 if (maxLen != -1) {
@@ -376,6 +397,26 @@ namespace EdmGen06 {
                                     csdlProperty.SetAttributeValue("MaxLength", dbc.ColumnType.MaxLength.Value + "");
                                 }
                             }
+#if ENTITIES6
+                            if (dbc.ColumnType.FixedLength.HasValue)
+                            {
+                                int maxLen = dbc.ColumnType.FixedLength.Value;
+                                if (maxLen != -1)
+                                {
+                                    ssdlProperty.SetAttributeValue("FixedLength", dbc.ColumnType.FixedLength.Value + "");
+                                    csdlProperty.SetAttributeValue("FixedLength", dbc.ColumnType.FixedLength.Value + "");
+                                }
+                            }
+                            if (dbc.ColumnType.Unicode.HasValue)
+                            {
+                                int maxLen = dbc.ColumnType.Unicode.Value;
+                                if (maxLen != -1)
+                                {
+                                    ssdlProperty.SetAttributeValue("MaxLength", dbc.ColumnType.Unicode.Value + "");
+                                    csdlProperty.SetAttributeValue("MaxLength", dbc.ColumnType.Unicode.Value + "");
+                                }
+                            }
+#endif
                             if (isId) {
                                 hasKey = true;
                                 if (ssdlKey == null) {
@@ -797,7 +838,8 @@ namespace EdmGen06 {
             }
         }
 
-        Nameut nut = new Nameut();
+        //Nameut nut = new Nameut();
+        Nameut nut = new NameutVs2017();
 
         class Nameut {
             public DbProviderManifest providerManifest { get; set; }
@@ -805,10 +847,10 @@ namespace EdmGen06 {
             public String targetSchema { get; set; }
             public String[] localTypes = new String[0];
 
-            public String SsdlNs() { return String.Format("{0}", targetSchema); }
-            public String SsdlContainer() { return String.Format("{0}StoreContainer", modelName); }
+            public virtual String SsdlNs() { return String.Format("{0}", targetSchema); }
+            public virtual String SsdlContainer() { return String.Format("{0}StoreContainer", modelName); }
             public String SsdlEntitySet(TableOrView dbt) { return String.Format("{1}", dbt.SchemaName, dbt.Name); }
-            public String SsdlEntityType(TableOrView dbt) { return String.Format("{0}_{1}", dbt.SchemaName, dbt.Name); }
+            public virtual String SsdlEntityType(TableOrView dbt) { return String.Format("{0}_{1}", dbt.SchemaName, dbt.Name); }
             public String SsdlEntityTypeRef(TableOrView dbt) { return String.Format("{0}.{1}", SsdlNs(), SsdlEntityType(dbt)); }
 
             public String SsdlProp(Column dbc) { return dbc.Name; }
@@ -816,9 +858,9 @@ namespace EdmGen06 {
             public String SsdlPropType(Column dbc) { return SsdlPropType(dbc.ColumnType); }
             public String SsdlPropType(TypeSpecification ts) { return ts.TypeName; }
 
-            public String CsdlNs() { return String.Format("{0}", modelName); }
+            public virtual String CsdlNs() { return String.Format("{0}", modelName); }
 
-            public String CsdlContainer() { return String.Format("{0}Entities", modelName); }
+            public virtual String CsdlContainer() { return String.Format("{0}Entities", modelName); }
             public String CsdlEntitySet(TableOrView dbt) { return TSimpleIdentifier(dbt.Name); }
             public String CsdlEntityType(TableOrView dbt) { return TSimpleIdentifier(String.Format("{0}", dbt.Name)); }
             public String CsdlEntityTypeRef(TableOrView dbt) { return String.Format("{0}.{1}", CsdlNs(), CsdlEntityType(dbt)); }
@@ -950,6 +992,28 @@ namespace EdmGen06 {
                 else if (dbfp.Mode == "INOUT") return "InOut";
                 return "";
             }
+        }
+
+        class NameutVs2017: Nameut
+        {
+            /*
+                 <edmx:StorageModels>
+                <Schema Namespace="SpeedyTabletSystemModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+
+                     <EntityContainer Name="SpeedyTabletSystemModelStoreContainer">
+              <EntitySet Name="DeviceDatabaseUpdates" EntityType="Self.DeviceDatabaseUpdates" Schema="dbo" store:Type="Tables" />
+
+            <edmx:ConceptualModels>
+            <Schema Namespace = "SpeedyTabletStatisticsModel" Alias="Self" xmlns="http://schemas.microsoft.com/ado/2009/11/edm" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation">
+            <EntityContainer Name = "SpeedyTabletStatisticsEntities" annotation:LazyLoadingEnabled="true" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation">
+            */
+            public override String SsdlNs() { return String.Format("{0}.Store", targetSchema); }
+            public override String SsdlContainer() { return String.Format("{0}StoreContainer", targetSchema); }
+            public override String SsdlEntityType(TableOrView dbt) { return String.Format("{1}", dbt.SchemaName, dbt.Name); }
+
+            public override String CsdlContainer() { return String.Format("{0}Entities", modelName); }
+            public override String CsdlNs() { return String.Format("{0}Model", modelName); }
+            
         }
 
         class UUt {

@@ -2404,6 +2404,9 @@ namespace Store
             typeSpecification.Collation = StructuralObject.VerifyComplexObjectIsNotNull(collation, "Collation");
             typeSpecification.CharacterSet = StructuralObject.VerifyComplexObjectIsNotNull(characterSet, "CharacterSet");
             typeSpecification.IsMultiSet = isMultiSet;
+            //, int? fixedLength, int? unicode
+           // typeSpecification.FixedLength = fixedLength;
+            //typeSpecification.Unicode = unicode;
             return typeSpecification;
         }
 
@@ -2555,10 +2558,59 @@ namespace Store
         partial void OnIsMultiSetChanging(global::System.Boolean value);
         partial void OnIsMultiSetChanged();
 
+
+        /// <summary>
+        /// 使用できるメタデータ ドキュメントはありません。
+        /// </summary>
+        [EdmScalarPropertyAttribute(EntityKeyProperty = false, IsNullable = true)]
+        [DataMemberAttribute()]
+        public Nullable<global::System.Int32> FixedLength
+        {
+            get
+            {
+                return _FixedLength;
+            }
+            set
+            {
+                OnFixedLengthChanging(value);
+                ReportPropertyChanging("FixedLength");
+                _FixedLength = StructuralObject.SetValidValue(value);
+                ReportPropertyChanged("FixedLength");
+                OnFixedLengthChanged();
+            }
+        }
+        private Nullable<global::System.Int32> _FixedLength;
+        partial void OnFixedLengthChanging(Nullable<global::System.Int32> value);
+        partial void OnFixedLengthChanged();
+
+        /// <summary>
+        /// 使用できるメタデータ ドキュメントはありません。
+        /// </summary>
+        [EdmScalarPropertyAttribute(EntityKeyProperty = false, IsNullable = true)]
+        [DataMemberAttribute()]
+        public Nullable<global::System.Int32> Unicode
+        {
+            get
+            {
+                return _Unicode;
+            }
+            set
+            {
+                OnUnicodeChanging(value);
+                ReportPropertyChanging("Unicode");
+                _Unicode = StructuralObject.SetValidValue(value);
+                ReportPropertyChanged("Unicode");
+                OnUnicodeChanged();
+            }
+        }
+        private Nullable<global::System.Int32> _Unicode;
+        partial void OnUnicodeChanging(Nullable<global::System.Int32> value);
+        partial void OnUnicodeChanged();
+
         #endregion
 
         #region 複合プロパティ
-    
+
         /// <summary>
         /// 使用できるメタデータ ドキュメントはありません。
         /// </summary>
